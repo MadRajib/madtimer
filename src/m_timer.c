@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 m_timer_manager_t m_timer_manager = {0};
 
@@ -42,9 +43,15 @@ bool m_timer_exec(m_timer_t *timer) {
 
     timer->last_run = get_tick();
 
-    if (timer->repeat_count > 0)
+    if (timer->repeat_count > 0) {
       timer->repeat_count--;
-
+    } else if (timer->auto_delete) {
+      fprintf(stdout, "removing timer\n");
+      list_del(&timer->node);
+      memset(timer, 0, sizeof(m_timer_t));
+      timer = NULL;
+    }
+  
     ret = true;
   }
 
